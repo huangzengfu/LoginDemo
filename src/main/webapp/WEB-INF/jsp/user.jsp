@@ -6,6 +6,6 @@
 <body>
 <h1>用户登录成功</h1>
 <br>
-欢迎您: ${user.username}
+欢迎您: ${userLogin.username}
 </body>
 </html>
