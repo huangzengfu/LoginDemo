@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDateTime;
+
 /**
  * @author HuangFu
  * @create 2022/10/16 16:36
@@ -50,5 +52,13 @@ public class MyController {
         model.addAttribute("data", "注册成功，请登录！");
         return "login";
 
+    }
+
+    public static void main(String[] args) {
+        LocalDateTime time = LocalDateTime.now();
+        System.out.println(time.toString());
+        int dayOfMonth = time.getDayOfMonth();
+        String seSuTaskId ="8763bece5afd4be9aaa183b5c3a216ff";
+        System.out.println(dayOfMonth << 16 | 2);
     }
 }
