@@ -140,9 +140,15 @@ public class MyThreadPoolExecutor implements Executor {
     }
 
     /**
-     * 从队列中获取任务
+     * 从队列中获取任务,take()方法会一直阻塞直到获取任务，
      */
     public Runnable getTask() {
-        return taskQueue.poll();
+        try {
+            return taskQueue.take();
+        } catch (InterruptedException e) {
+            //当前线程结束了，需要将runningCount减一
+            runningCount.decrementAndGet();
+            return null;
+        }
     }
 }
