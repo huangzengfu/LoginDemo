@@ -1,8 +1,6 @@
 package com.huangfu.logindemo.utils;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -10,12 +8,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @create 2022/11/12 14:49
  * 手动实现自定义的线程池
  **/
-public class MyThreadPoolExecutor implements Executor {
+public class MyThreadPoolExecutor extends ThreadPoolExecutor implements Executor {
 
     /**
      * 线程池名称
      */
-    private String threadPoolName;
+//    private String threadPoolName;
 
     /**
      * 核心线程数
@@ -35,7 +33,7 @@ public class MyThreadPoolExecutor implements Executor {
     /**
      * 拒绝策略
      */
-    private RejectedExecutionHandler rejectPolicy;
+    private DiscardRejectPolicy rejectPolicy;
 
     /**
      * 正在执行的线程数量
@@ -47,13 +45,15 @@ public class MyThreadPoolExecutor implements Executor {
      */
     private AtomicInteger sequence = new AtomicInteger(0);
 
-    public MyThreadPoolExecutor(String threadPoolName, Integer coreSize, Integer maxSize, BlockingQueue<Runnable> taskQueue, RejectedExecutionHandler rejectPolicy) {
-        this.threadPoolName = threadPoolName;
+    public MyThreadPoolExecutor(Integer coreSize, Integer maxSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> taskQueue, RejectedExecutionHandler rejectPolicy) {
+//        this.threadPoolName = threadPoolName;
+        super(coreSize, maxSize, keepAliveTime, unit, taskQueue, rejectPolicy);
         this.coreSize = coreSize;
         this.maxSize = maxSize;
         this.taskQueue = taskQueue;
-        this.rejectPolicy = rejectPolicy;
+        this.rejectPolicy = (DiscardRejectPolicy) rejectPolicy;
     }
+
 
     /**
      * 重写线程执行器Executor中的execute方法
@@ -80,10 +80,9 @@ public class MyThreadPoolExecutor implements Executor {
 
         } else {
             //添加队列失败，就创建一个非核心线程
-            if (addWorker(task, false)) {
-                return;
-            } else {
-                //创建非核心线程失败就执行丢弃策略
+            //如果创建非核心线程失败，就执行丢弃策略
+            if (!addWorker(task, false)) {
+                this.rejectPolicy.rejectedExecution(task, this);
             }
         }
 
@@ -111,7 +110,7 @@ public class MyThreadPoolExecutor implements Executor {
 
             if (runningCount.compareAndSet(count, count + 1)) {
                 //定义线程名字
-                String threadName = core ? "core_" : "" + "name" + sequence.getAndIncrement();
+                String threadName = (core ? "core_" : "") + "name" + sequence.getAndIncrement();
 
                 //创建线程并启动
                 new Thread(() -> {
@@ -150,5 +149,30 @@ public class MyThreadPoolExecutor implements Executor {
             runningCount.decrementAndGet();
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        MyThreadPoolExecutor myThreadPoolExecutor = new MyThreadPoolExecutor(5, 10, 3,
+                TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(15), new DiscardRejectPolicy());
+
+        AtomicInteger num = new AtomicInteger(0);
+
+        for (int i = 0; i < 100; i++) {
+            try {
+                myThreadPoolExecutor.execute(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("正在执行：" + System.currentTimeMillis() + ": " + num.incrementAndGet());
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                myThreadPoolExecutor.shutdown();
+            }
+        }
+
     }
 }
