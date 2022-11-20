@@ -152,12 +152,14 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor implements Executor
     }
 
     public static void main(String[] args) {
-        MyThreadPoolExecutor myThreadPoolExecutor = new MyThreadPoolExecutor(5, 10, 3,
+        MyThreadPoolExecutor myThreadPoolExecutor = new MyThreadPoolExecutor(5, 10, 1,
                 TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(15), new DiscardRejectPolicy());
+        myThreadPoolExecutor.allowCoreThreadTimeOut(true);
 
         AtomicInteger num = new AtomicInteger(0);
 
-        for (int i = 0; i < 100; i++) {
+
+        for (int i = 0; i < 30; i++) {
             try {
                 myThreadPoolExecutor.execute(() -> {
                     try {
@@ -169,8 +171,6 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor implements Executor
                 });
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                myThreadPoolExecutor.shutdown();
             }
         }
 
