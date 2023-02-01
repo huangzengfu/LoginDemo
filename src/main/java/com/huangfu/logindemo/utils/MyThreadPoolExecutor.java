@@ -1,9 +1,5 @@
 package com.huangfu.logindemo.utils;
 
-import com.huangfu.logindemo.pojo.UserLogin;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -154,60 +150,29 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor implements Executor
             return null;
         }
     }
-    public static String generatePortAccessDetailTableName(String portAccessConfigUuid){
-        if(portAccessConfigUuid.contains("_")){
-            portAccessConfigUuid = portAccessConfigUuid.split("_")[1];
-        }
-        return "port_access_detail_" + Math.abs(portAccessConfigUuid.hashCode()) % 20;
-    }
-
 
     public static void main(String[] args) {
-//        MyThreadPoolExecutor myThreadPoolExecutor = new MyThreadPoolExecutor(5, 10, 1,
-//                TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(15), new DiscardRejectPolicy());
-//        myThreadPoolExecutor.allowCoreThreadTimeOut(true);
-//
-//        AtomicInteger num = new AtomicInteger(0);
-//
-//
-//        for (int i = 0; i < 30; i++) {
-//            try {
-//                myThreadPoolExecutor.execute(() -> {
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    System.out.println("正在执行：" + System.currentTimeMillis() + ": " + num.incrementAndGet());
-//                });
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        System.out.println(System.currentTimeMillis());
-//        List<UserLogin> list = new ArrayList<>();
-//        UserLogin l1 = new UserLogin("aa", "123");
-//        UserLogin l2 = new UserLogin("bb", "123");
-//        list.add(l1);
-//        list.add(l2);
-//        for (UserLogin elem:list){
-//            if(elem.getUsername()=="aa"){
-//                elem.setPassword("456");
-//            }else{
-//                elem.setPassword("789");
-//            }
-//
-//        }
-//        System.out.println(list);
-        String process = "";
-        if(process==null){
-            System.out.println("lll");
-        }else{
-            System.out.println("hhh");
+        MyThreadPoolExecutor myThreadPoolExecutor = new MyThreadPoolExecutor(5, 10, 1,
+                TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(15), new DiscardRejectPolicy());
+        myThreadPoolExecutor.allowCoreThreadTimeOut(true);
+
+        AtomicInteger num = new AtomicInteger(0);
+
+
+        for (int i = 0; i < 30; i++) {
+            try {
+                myThreadPoolExecutor.execute(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("正在执行：" + System.currentTimeMillis() + ": " + num.incrementAndGet());
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        System.out.println("---------------------------");
-
     }
-
 }
